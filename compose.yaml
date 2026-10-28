@@ -18,12 +18,10 @@ services:
     restart: unless-stopped
 
   backend:
-    build:
-      context: ./backend
-    image: fest-backend:0.1
+    image: tiwaripallavii/fest-backend:1.0.0
     environment:
       REGNO: "202401100500199"
-      APP_VERSION: "dev"
+      APP_VERSION: "1.0.0"
       DB_HOST: db
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
