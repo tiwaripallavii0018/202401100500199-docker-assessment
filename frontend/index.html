@@ -1,0 +1,91 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FestPass 2026</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 640px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    input, select, button {
+      margin: 0.3rem;
+      padding: 0.5rem;
+    }
+    #status {
+      padding: 0.5rem;
+      background: #eef2ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>FestPass 2026 registrations</h1>
+  <p id="status">Checking the backend...</p>
+
+  <form id="form">
+    <input id="name" placeholder="Your name" required>
+    <select id="event">
+      <option>Hackathon</option>
+      <option>Robo Race</option>
+      <option>Tech Quiz</option>
+    </select>
+    <button type="submit">Register</button>
+  </form>
+
+  <ul id="list"></ul>
+
+  <script>
+    const api = (path, options) =>
+      fetch("/api/" + path, options).then(async response => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Request failed");
+        return data;
+      });
+
+    async function refresh() {
+      const status = document.getElementById("status");
+      try {
+        const h = await api("health");
+        status.textContent =
+          `REGNO ${h.regno} | backend ${h.version} | database ` +
+          `${h.database ? "connected" : "not connected"}`;
+
+        const rows = await api("registrations");
+        document.getElementById("list").replaceChildren(
+          ...rows.map(r => {
+            const li = document.createElement("li");
+            li.textContent = `#${r.id} ${r.name} (${r.event})`;
+            return li;
+          })
+        );
+      } catch (error) {
+        status.textContent = "Backend/database not reachable";
+      }
+    }
+
+    document.getElementById("form").addEventListener("submit", async e => {
+      e.preventDefault();
+      try {
+        await api("registrations", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            name: document.getElementById("name").value,
+            event: document.getElementById("event").value
+          })
+        });
+        document.getElementById("name").value = "";
+        await refresh();
+      } catch (error) {
+        document.getElementById("status").textContent = error.message;
+      }
+    });
+
+    refresh();
+  </script>
+</body>
+</html>
