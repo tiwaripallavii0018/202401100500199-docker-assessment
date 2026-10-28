@@ -1,3 +1,23 @@
+## Stage 1: Backend Containerization
+
+- Created a Dockerfile for the Python Flask backend.
+- Used a lightweight, version-pinned Python base image.
+- Installed application dependencies from `requirements.txt`.
+- Configured the application to run as a non-root user.
+- Set the registration number and application version through environment variables.
+- Exposed port `5000` for the backend API.
+
+## Stage 2: Multi-Container Application with Docker Compose
+
+- Created a Docker Compose configuration for the frontend, backend, and PostgreSQL database.
+- Used Nginx to serve the frontend.
+- Connected the backend to PostgreSQL using environment variables.
+- Configured separate `frontend-backend` and `backend-db` networks.
+- Made the `backend-db` network internal to restrict external access.
+- Used a named volume, `postgres_data`, to persist database data.
+- Added a PostgreSQL health check and configured the backend to wait for the database to become healthy.
+- Published the frontend on host port `179`.
+- Verified the backend health endpoint returns the registration number, application version, and database connection status.
 
 ## Stage 3: Trivy Vulnerability Scan
 
